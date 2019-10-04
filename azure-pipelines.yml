@@ -33,3 +33,9 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'app'
     publishLocation: 'Container'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'Infrastructure'
+    ArtifactName: 'infrastructure'
+    publishLocation: 'Container'
