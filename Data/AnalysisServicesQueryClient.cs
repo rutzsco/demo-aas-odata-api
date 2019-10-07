@@ -29,7 +29,7 @@ namespace Demo.Api.Data
 
         public IEnumerable<PerformanceIndicator> RunQuery(string query)
         {
-            if (string.IsNullOrEmpty(_aasServerName))
+            if (string.IsNullOrEmpty(_aasServerName) || _aasServerName == "VALUE_GOES_HERE")
             {
                 yield return new PerformanceIndicator() { Id = 0, Name = "RecordCount", Value = "100" };
                 yield return new PerformanceIndicator() { Id = 1, Name = "FieldCount", Value = "20" };
