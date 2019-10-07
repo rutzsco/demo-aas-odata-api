@@ -29,28 +29,35 @@ namespace Demo.Api.Data
 
         public IEnumerable<PerformanceIndicator> RunQuery(string query)
         {
-
-            var token = GetAccessToken(_aasTokenUrl);
-            var connectionString = $"Provider=MSOLAP;Data Source={_aasServerName};Initial Catalog=adventureworks;User ID=;Password={token};Persist Security Info=True;Impersonation Level=Impersonate";
-            ConnectionManager.Initialize(connectionString);
-            var connection = ConnectionManager.GetConnection();
-
-            using (AdomdCommand command = new AdomdCommand(query, connection))
+            if (string.IsNullOrEmpty(_aasServerName))
             {
-                using (var results = command.ExecuteReader())
-                {
-                    int count = 0;
-                    int fieldcount = 0;
-                    foreach (var record in results)
-                    {
-                        count++;
-                        fieldcount = record.FieldCount;
-                    }
-                    yield return new PerformanceIndicator() { Id = 0, Name = "RecordCount", Value = count.ToString() };
-                    yield return new PerformanceIndicator() { Id = 1, Name = "FieldCount", Value = fieldcount.ToString() };
-                }
+                yield return new PerformanceIndicator() { Id = 0, Name = "RecordCount", Value = "100" };
+                yield return new PerformanceIndicator() { Id = 1, Name = "FieldCount", Value = "20" };
             }
-            ConnectionManager.ReturnConnection(connection);
+            else
+            {
+                var token = GetAccessToken(_aasTokenUrl);
+                var connectionString = $"Provider=MSOLAP;Data Source={_aasServerName};Initial Catalog=adventureworks;User ID=;Password={token};Persist Security Info=True;Impersonation Level=Impersonate";
+                ConnectionManager.Initialize(connectionString);
+                var connection = ConnectionManager.GetConnection();
+
+                using (AdomdCommand command = new AdomdCommand(query, connection))
+                {
+                    using (var results = command.ExecuteReader())
+                    {
+                        int count = 0;
+                        int fieldcount = 0;
+                        foreach (var record in results)
+                        {
+                            count++;
+                            fieldcount = record.FieldCount;
+                        }
+                        yield return new PerformanceIndicator() { Id = 0, Name = "RecordCount", Value = count.ToString() };
+                        yield return new PerformanceIndicator() { Id = 1, Name = "FieldCount", Value = fieldcount.ToString() };
+                    }
+                }
+                ConnectionManager.ReturnConnection(connection);
+            }
         }
 
         private string GetAccessToken(string aasUrl)
